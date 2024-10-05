@@ -1,6 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using CardGame.Gameplay.Cards.Data;
+using CardGame.Utils;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace CardGame.Gameplay.Cards
 {
@@ -27,6 +30,21 @@ namespace CardGame.Gameplay.Cards
             }
 
             InitializeCardGroups();
+        }
+
+        public IEnumerable<CardInfo> GetRandomCards(int count)
+        {
+            var result = new List<CardInfo>();
+
+            for (var i = 0; i < count; i++)
+            {
+                var randomDenomination = Utility.GetRandomOf<Denomination>(min:1);
+                var randomSuit = Random.Range(0, _cards[randomDenomination].Count);
+                
+                result.Add(_cards[randomDenomination][randomSuit]);
+            }
+            
+            return result;
         }
 
         private void InitializeCardsInfo(Denomination denomination, Sprite cardSprite, Sprite backSprite)

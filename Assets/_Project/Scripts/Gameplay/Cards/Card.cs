@@ -17,12 +17,14 @@ namespace CardGame.Gameplay.Cards
 
         public Card Parent { get; private set; }
         public Card Child { get; private set; }
+        public Denomination Denomination => _info.Denomination;
 
         public void Initialize(CardInfo cardInfo)
         {
             _info = cardInfo;
 
             _suitImage.sprite = _info.BackSprite;
+            name = $"Card - {_info.Denomination}";
         }
 
         public void ShowFront()
@@ -43,6 +45,18 @@ namespace CardGame.Gameplay.Cards
                     }))
                 .Append(_suitImage.transform
                     .DORotate(Vector3.zero, rotateOneSideDuration));
+        }
+        
+        public void PlayShowAnimation(int index)
+        {
+            const float delay = 0.15f;
+
+            transform.localScale = Vector3.zero;
+
+            transform
+                .DOScale(Vector3.one, 0.5f)
+                .SetEase(Ease.OutBack)
+                .SetDelay(delay * index);
         }
 
         public void OnPointerClick(PointerEventData eventData)

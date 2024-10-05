@@ -11,16 +11,19 @@ namespace CardGame.Gameplay.Cards
     {
         [SerializeField] private Card[] _emptyCards;
         
-        private readonly List<Card> _cards = new();
+        private readonly Stack<Card> _cards = new();
 
         public void Initialize(Dictionary<Denomination, List<CardInfo>> cards)
         {
-            foreach (var emptyCard in _emptyCards)
+            for (var i = 0; i < _emptyCards.Length; i++)
             {
+                var emptyCard = _emptyCards[i];
+                
                 Register(emptyCard, cards);
+                emptyCard.PlayShowAnimation(i);
             }
-            
-            _cards.Last().ShowFront();
+
+            _cards.Peek().ShowFront();
         }
 
         private void Register(Card card, Dictionary<Denomination, List<CardInfo>> cards)
@@ -29,39 +32,53 @@ namespace CardGame.Gameplay.Cards
                 .SelectMany(x => x.Value)
                 .OrderBy(x => Guid.NewGuid()).First();
             
-            var lastCard = _cards.LastOrDefault();
-            card.SetParent(lastCard);
+            var previousCard = _cards.Count == 0 ? null : _cards.Peek();
 
-            if (lastCard != null)
-                lastCard.SetChild(card);
+            if (previousCard != null)
+            {
+                card.SetParent(previousCard);
+                previousCard.SetChild(card);
+            }
             
             card.Initialize(rndCardInfo);
             card.SubscribeOnClick(TryPickCard);
             
-            _cards.Add(card);
+            _cards.Push(card);
         }
 
         private void TryPickCard(Card card)
         {
-            if (_cards.LastOrDefault() == card)
+            if (_cards.Peek() == card && IsNeighbourCards(card))
             {
                 card.UnsubscribeOnClick(TryPickCard);
                 
-                card.transform
-                    .DOScale(Vector3.zero, 0.75f)
-                    .SetEase(Ease.InBack)
-                    .OnKill(() =>
-                    {
-                        _cards.Remove(card);
-                        var parent = card.Parent;
+                _cards.Pop();
+                var parent = card.Parent;
 
-                        if (parent != null) 
-                            parent.ShowFront();
-
-                        Destroy(card.gameObject);
-                    });
+                if (parent != null) 
+                    parent.ShowFront();
                 
+                CardsBankController.Instance.SetCard(card);
             }
+        }
+
+        private static bool IsNeighbourCards(Card card)
+        {
+            var currentDenomination = CardsBankController.Instance.CurrentCard.Denomination;
+            
+            Denomination topNeighbour;
+            Denomination bottomNeighbour;
+            
+            if (currentDenomination == Denomination.King)
+                topNeighbour = Denomination.A;
+            else topNeighbour = currentDenomination + 1;
+            
+            if (currentDenomination == Denomination.A)
+                bottomNeighbour = Denomination.King;
+            else bottomNeighbour = currentDenomination - 1;
+            
+            return card.Denomination == topNeighbour || card.Denomination == bottomNeighbour;
+            
         }
     }
 }
