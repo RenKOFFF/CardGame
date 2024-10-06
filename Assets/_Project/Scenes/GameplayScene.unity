@@ -265,6 +265,7 @@ MonoBehaviour:
   - {fileID: 3937651890191246954}
   - {fileID: 1576593324}
   - {fileID: 1679357062}
+  _bankController: {fileID: 1153554053}
 --- !u!1 &89536203
 GameObject:
   m_ObjectHideFlags: 0
@@ -310,7 +311,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _cardController: {fileID: 68323181}
-  _bankController: {fileID: 1153554053}
 --- !u!1 &197634824
 GameObject:
   m_ObjectHideFlags: 0
@@ -631,11 +631,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d8e6f29cdf124b268007f2586bda63a8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _cardController: {fileID: 68323181}
+  _cardGroups:
+  - {fileID: 1714850173353626199}
+  - {fileID: 3937651890191246954}
+  - {fileID: 1576593324}
+  - {fileID: 1679357062}
   _currentCardHolder: {fileID: 197634825}
   _poolCardHolder: {fileID: 58997542}
   _cardPrefab: {fileID: 6918226085552103611, guid: 09192e213e5f9b84e9bd542ecf11e16e, type: 3}
-  _poolSize: 7
 --- !u!1 &1311220885
 GameObject:
   m_ObjectHideFlags: 0

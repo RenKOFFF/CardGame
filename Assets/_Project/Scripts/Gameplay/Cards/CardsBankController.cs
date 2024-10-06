@@ -1,6 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
+using CardGame.Gameplay.Cards.Data;
 using DG.Tweening;
 using UnityEngine;
 
@@ -11,40 +11,41 @@ namespace CardGame.Gameplay.Cards
         private const float _POOL_SPACING_MIN = 5f;
         private const float _POOL_SPACING_MAX = 20f;
 
-        public static CardsBankController Instance { get; private set; }
-        public Card CurrentCard { get; set; }
-
-        [SerializeField] private CardController _cardController;
-
+        [SerializeField] private CardGroup[] _cardGroups;
+        
         [SerializeField] private Transform _currentCardHolder;
 
         [SerializeField] private Transform _poolCardHolder;
         [SerializeField] private Card _cardPrefab;
-        [SerializeField] private int _poolSize = 5;
-
+        
         private readonly List<Card> _passedCards = new();
         private readonly Stack<Card> _cardsPool = new();
 
+        private int _startPoolSize;
+        private List<CardInfo> _bankCardsInfo;
 
-        public void Initialize()
+        public static CardsBankController Instance { get; private set; }
+        public Card CurrentCard { get; private set; }
+
+        public void Initialize(CardInfo[] cardsInfo)
         {
             Instance = this;
+            
+            _bankCardsInfo = cardsInfo.ToList();
+            _startPoolSize = cardsInfo.Length;
 
-            var randomData = _cardController.GetRandomCards(_poolSize).ToArray();
-
-            for (var i = 0; i < _poolSize; i++)
+            for (var i = 0; i < _startPoolSize; i++)
             {
                 var card = Instantiate(_cardPrefab, _poolCardHolder);
                 _cardsPool.Push(card);
 
-                card.transform.position = CalculateCardPosition(_poolSize, i);
+                card.transform.position = CalculateCardPosition(_startPoolSize, i);
                 card.PlayShowAnimation(i);
 
-                card.Initialize(randomData[i]);
                 card.SubscribeOnClick(ChangeCurrentCard);
             }
 
-            SetCard(_cardsPool.Pop());
+            ChangeCurrentCard(_cardsPool.Peek());
         }
 
         public void SetCard(Card card)
@@ -62,9 +63,40 @@ namespace CardGame.Gameplay.Cards
         {
             if (card == CurrentCard || _cardsPool.Count == 0 || _cardsPool.Peek() != card)
                 return;
+            
+            var startSequenceCard = FindStartSequenceCard();
+            card.Initialize(startSequenceCard);
 
             SetCard(_cardsPool.Pop());
             RecalculateCardsPosition();
+        }
+
+        private CardInfo FindStartSequenceCard()
+        {
+            var groupPeek = _cardGroups
+                .Where(g => g.TopCard != null)
+                .Select(g => g.TopCard);
+            
+            var currentInfos = _bankCardsInfo;
+
+            var cardInfo = new List<CardInfo>();
+            foreach (var peek in groupPeek)
+            {
+                var neighbourCards = currentInfos
+                    .Where(c => CardInfo.IsNeighbourCards(peek.Denomination, c.Denomination))
+                    .ToList();
+                
+                cardInfo.AddRange(neighbourCards);
+            }
+
+            var info = cardInfo.FirstOrDefault();
+            if (info != null)
+            {
+                _bankCardsInfo.Remove(info);
+                return info;
+            }
+            
+            return _bankCardsInfo.First();
         }
 
         private void RecalculateCardsPosition()
@@ -93,10 +125,10 @@ namespace CardGame.Gameplay.Cards
 
         private Vector3 CalculateCardPosition(int currentPoolSize, int cardIndex)
         {
-            var spacing = Mathf.Lerp(_POOL_SPACING_MIN, _POOL_SPACING_MAX, (float)currentPoolSize / _poolSize);
+            var spacing = Mathf.Lerp(_POOL_SPACING_MIN, _POOL_SPACING_MAX, (float)currentPoolSize / _startPoolSize);
 
             var holderPosition = _poolCardHolder.transform.position;
-            var leftPoint = holderPosition + Vector3.left * (spacing * _poolSize);
+            var leftPoint = holderPosition + Vector3.left * (spacing * _startPoolSize);
 
             return Vector3.Lerp(leftPoint, holderPosition, ((float)cardIndex + 1) / currentPoolSize);
         }

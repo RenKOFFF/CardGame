@@ -1,7 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Linq;
 using CardGame.Gameplay.Cards.Data;
-using CardGame.Utils;
+using CardGame.Gameplay.Cards.Deck;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -11,9 +11,13 @@ namespace CardGame.Gameplay.Cards
     {
         [SerializeField] private Sprite _backSprite;
         [SerializeField] private CardSuit[] _cardsSuitsData;
+        
         [SerializeField] private CardGroup[] _cardGroups;
+        [SerializeField] private CardsBankController _bankController;
 
         private readonly Dictionary<Denomination, List<CardInfo>> _cards = new();
+        
+        private CardsDeck _cardsDeck;
 
         public void Initialize()
         {
@@ -28,23 +32,12 @@ namespace CardGame.Gameplay.Cards
                     InitializeCardsInfo((Denomination)(i + 1), cardSprite, backSprite);
                 }
             }
-
-            InitializeCardGroups();
-        }
-
-        public IEnumerable<CardInfo> GetRandomCards(int count)
-        {
-            var result = new List<CardInfo>();
-
-            for (var i = 0; i < count; i++)
-            {
-                var randomDenomination = Utility.GetRandomOf<Denomination>(min:1);
-                var randomSuit = Random.Range(0, _cards[randomDenomination].Count);
-                
-                result.Add(_cards[randomDenomination][randomSuit]);
-            }
             
-            return result;
+            _cardsDeck = new CardsDeck(_cards);
+            var sequences = _cardsDeck.CurrentSequences.ToArray();
+
+            InitializeBanks(sequences);
+            InitializeCardGroups(sequences);
         }
 
         private void InitializeCardsInfo(Denomination denomination, Sprite cardSprite, Sprite backSprite)
@@ -59,11 +52,75 @@ namespace CardGame.Gameplay.Cards
             _cards[denomination].Add(cardInfo);
         }
 
-        private void InitializeCardGroups()
+        private void InitializeBanks(IEnumerable<CardSequence> sequences)
         {
-            foreach (var cardGroup in _cardGroups)
+            var startingCards = sequences
+                .Select(s => s.FirstCard)
+                .ToArray();
+            
+            _bankController.Initialize(startingCards);
+        }
+
+        private void InitializeCardGroups(IEnumerable<CardSequence> sequences)
+        {
+            var sequencesIntoGroups = DistributeSequencesIntoGroups(sequences);
+
+            foreach (var group in sequencesIntoGroups)
             {
-                cardGroup.Initialize(_cards);
+                group.Key.Initialize(group.Value);
+            }
+        }
+
+        private Dictionary<CardGroup, List<CardInfo>> DistributeSequencesIntoGroups(IEnumerable<CardSequence> sequences)
+        {
+            CardGroup lastCardGroup = null;
+            
+            var cardSequences = sequences.ToArray();
+            var cardsByCardGroup = new Dictionary<CardGroup, List<CardInfo>>();
+            
+            foreach (var sequence in cardSequences)
+            {
+                foreach (var info in sequence.Sequence)
+                {
+                    var randomGroup = _cardGroups
+                        .Where(g => g != lastCardGroup && IsFullData(g) == false)
+                        .OrderBy(_ => Random.value)
+                        .FirstOrDefault();
+                    
+                    if (randomGroup == null && IsFullData(lastCardGroup))
+                    {
+                        return cardsByCardGroup;
+                    }
+
+                    if (randomGroup != null)
+                    {
+                        lastCardGroup = randomGroup;
+                    }
+
+                    if (lastCardGroup == null)
+                    {
+                        throw new System.Exception("No card group found");
+                    }
+                    
+                    if (!cardsByCardGroup.ContainsKey(lastCardGroup))
+                    {
+                        cardsByCardGroup.Add(lastCardGroup, new List<CardInfo>());
+                    }
+            
+                    cardsByCardGroup[lastCardGroup].Add(info);
+                }
+            }
+
+            return cardsByCardGroup;
+            
+            bool IsFullData(CardGroup group)
+            {
+                if (!cardsByCardGroup.ContainsKey(group))
+                {
+                    return false;
+                }
+                
+                return cardsByCardGroup[group].Count == group.CardCount;
             }
         }
     }
