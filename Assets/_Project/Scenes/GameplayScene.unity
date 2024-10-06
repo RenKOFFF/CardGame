@@ -202,9 +202,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 37cee751d1124939b2bb78d7d1c440b1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _backSprite: {fileID: 31712562, guid: 94ed89280f059e049a4fceac2bae864e, type: 3}
+  _backSprite: {fileID: -639779172, guid: 94ed89280f059e049a4fceac2bae864e, type: 3}
   _cardsSuitsData:
   - CardsSprites:
+    - {fileID: 31712562, guid: 94ed89280f059e049a4fceac2bae864e, type: 3}
     - {fileID: 1835806349, guid: 94ed89280f059e049a4fceac2bae864e, type: 3}
     - {fileID: -271908698, guid: 94ed89280f059e049a4fceac2bae864e, type: 3}
     - {fileID: 1420978544, guid: 94ed89280f059e049a4fceac2bae864e, type: 3}
@@ -217,7 +218,6 @@ MonoBehaviour:
     - {fileID: -2046045551, guid: 94ed89280f059e049a4fceac2bae864e, type: 3}
     - {fileID: 1839659421, guid: 94ed89280f059e049a4fceac2bae864e, type: 3}
     - {fileID: -1265588693, guid: 94ed89280f059e049a4fceac2bae864e, type: 3}
-    - {fileID: 2131938218, guid: 94ed89280f059e049a4fceac2bae864e, type: 3}
   - CardsSprites:
     - {fileID: -171538133, guid: 94ed89280f059e049a4fceac2bae864e, type: 3}
     - {fileID: -128796349, guid: 94ed89280f059e049a4fceac2bae864e, type: 3}
@@ -233,7 +233,6 @@ MonoBehaviour:
     - {fileID: -353973569, guid: 94ed89280f059e049a4fceac2bae864e, type: 3}
     - {fileID: -735648632, guid: 94ed89280f059e049a4fceac2bae864e, type: 3}
   - CardsSprites:
-    - {fileID: 223923778, guid: 94ed89280f059e049a4fceac2bae864e, type: 3}
     - {fileID: 682989523, guid: 94ed89280f059e049a4fceac2bae864e, type: 3}
     - {fileID: 855075703, guid: 94ed89280f059e049a4fceac2bae864e, type: 3}
     - {fileID: -971524153, guid: 94ed89280f059e049a4fceac2bae864e, type: 3}
@@ -246,9 +245,8 @@ MonoBehaviour:
     - {fileID: -697202687, guid: 94ed89280f059e049a4fceac2bae864e, type: 3}
     - {fileID: -1531877291, guid: 94ed89280f059e049a4fceac2bae864e, type: 3}
     - {fileID: 2136286369, guid: 94ed89280f059e049a4fceac2bae864e, type: 3}
+    - {fileID: 1039321682, guid: 94ed89280f059e049a4fceac2bae864e, type: 3}
   - CardsSprites:
-    - {fileID: 2122392033, guid: 94ed89280f059e049a4fceac2bae864e, type: 3}
-    - {fileID: -2090984276, guid: 94ed89280f059e049a4fceac2bae864e, type: 3}
     - {fileID: 2060190869, guid: 94ed89280f059e049a4fceac2bae864e, type: 3}
     - {fileID: -1054385919, guid: 94ed89280f059e049a4fceac2bae864e, type: 3}
     - {fileID: -1854246853, guid: 94ed89280f059e049a4fceac2bae864e, type: 3}
@@ -260,6 +258,8 @@ MonoBehaviour:
     - {fileID: -1728028380, guid: 94ed89280f059e049a4fceac2bae864e, type: 3}
     - {fileID: -1354626971, guid: 94ed89280f059e049a4fceac2bae864e, type: 3}
     - {fileID: -227637593, guid: 94ed89280f059e049a4fceac2bae864e, type: 3}
+    - {fileID: 560391305, guid: 94ed89280f059e049a4fceac2bae864e, type: 3}
+    - {fileID: 476234140, guid: 94ed89280f059e049a4fceac2bae864e, type: 3}
   _cardGroups:
   - {fileID: 1714850173353626199}
   - {fileID: 3937651890191246954}
