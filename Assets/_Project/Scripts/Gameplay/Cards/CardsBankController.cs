@@ -40,6 +40,7 @@ namespace CardGame.Gameplay.Cards
                 _cardsPool.Push(card);
 
                 card.transform.position = CalculateCardPosition(_startPoolSize, i);
+                card.Initialize(cardsInfo[i]);
                 card.PlayShowAnimation(i);
 
                 card.SubscribeOnClick(ChangeCurrentCard);
@@ -64,8 +65,8 @@ namespace CardGame.Gameplay.Cards
             if (card == CurrentCard || _cardsPool.Count == 0 || _cardsPool.Peek() != card)
                 return;
             
-            var startSequenceCard = FindStartSequenceCard();
-            card.Initialize(startSequenceCard);
+            // var startSequenceCard = FindStartSequenceCard();
+            // card.Initialize(startSequenceCard);
 
             SetCard(_cardsPool.Pop());
             RecalculateCardsPosition();

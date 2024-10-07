@@ -13,7 +13,11 @@ namespace CardGame.Gameplay.Cards.Deck
 
         public CardsDeck(Dictionary<Denomination, List<CardInfo>> cards)
         {
-            _allCards = cards.SelectMany(x => x.Value);
+            _allCards = cards
+                .SelectMany(x => x.Value)
+                .OrderBy(c => c.Suit)
+                .ThenBy(c => c.Denomination)
+                .ToArray();
             
             _cardSequenceGenerator = new CardSequenceGenerator(_allCards);
             

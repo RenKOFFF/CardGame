@@ -10,7 +10,6 @@ namespace CardGame.Gameplay.Cards.Deck
         public const int MIN_CARD_SEQUENCE_LENGTH = 2;
         public const int MAX_CARD_SEQUENCE_LENGTH = 7;
         
-        public const float TOP_CARD_PROBABILITY = 0.65f;
         public const float BOTTOM_CARD_PROBABILITY = 0.35f;
         public const float CHANGE_DIRECTION_PROBABILITY = 0.15f;
 
@@ -29,7 +28,16 @@ namespace CardGame.Gameplay.Cards.Deck
             while (cardInfos.Count - MAX_CARD_SEQUENCE_LENGTH > 0)
             {
                 var sequenceLength = Random.Range(MIN_CARD_SEQUENCE_LENGTH, MAX_CARD_SEQUENCE_LENGTH + 1);
-                var cardSequence = new CardSequence(cardInfos.GetRange(0, sequenceLength));
+                var sequence = cardInfos.GetRange(0, sequenceLength);
+                
+                var isBottom = Random.value <= BOTTOM_CARD_PROBABILITY;
+                
+                if (isBottom)
+                {
+                    sequence.Reverse();
+                }
+                
+                var cardSequence = new CardSequence(sequence);
                 
                 Sequences.Add(cardSequence);
                 cardInfos.RemoveRange(0, sequenceLength);

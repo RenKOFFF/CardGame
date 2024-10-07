@@ -204,7 +204,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _backSprite: {fileID: -639779172, guid: 94ed89280f059e049a4fceac2bae864e, type: 3}
   _cardsSuitsData:
-  - CardsSprites:
+  - Suit: 3
+    CardsSprites:
     - {fileID: 31712562, guid: 94ed89280f059e049a4fceac2bae864e, type: 3}
     - {fileID: 1835806349, guid: 94ed89280f059e049a4fceac2bae864e, type: 3}
     - {fileID: -271908698, guid: 94ed89280f059e049a4fceac2bae864e, type: 3}
@@ -218,7 +219,8 @@ MonoBehaviour:
     - {fileID: -2046045551, guid: 94ed89280f059e049a4fceac2bae864e, type: 3}
     - {fileID: 1839659421, guid: 94ed89280f059e049a4fceac2bae864e, type: 3}
     - {fileID: -1265588693, guid: 94ed89280f059e049a4fceac2bae864e, type: 3}
-  - CardsSprites:
+  - Suit: 0
+    CardsSprites:
     - {fileID: -171538133, guid: 94ed89280f059e049a4fceac2bae864e, type: 3}
     - {fileID: -128796349, guid: 94ed89280f059e049a4fceac2bae864e, type: 3}
     - {fileID: 1562497834, guid: 94ed89280f059e049a4fceac2bae864e, type: 3}
@@ -232,7 +234,8 @@ MonoBehaviour:
     - {fileID: 194135278, guid: 94ed89280f059e049a4fceac2bae864e, type: 3}
     - {fileID: -353973569, guid: 94ed89280f059e049a4fceac2bae864e, type: 3}
     - {fileID: -735648632, guid: 94ed89280f059e049a4fceac2bae864e, type: 3}
-  - CardsSprites:
+  - Suit: 2
+    CardsSprites:
     - {fileID: 682989523, guid: 94ed89280f059e049a4fceac2bae864e, type: 3}
     - {fileID: 855075703, guid: 94ed89280f059e049a4fceac2bae864e, type: 3}
     - {fileID: -971524153, guid: 94ed89280f059e049a4fceac2bae864e, type: 3}
@@ -246,7 +249,8 @@ MonoBehaviour:
     - {fileID: -1531877291, guid: 94ed89280f059e049a4fceac2bae864e, type: 3}
     - {fileID: 2136286369, guid: 94ed89280f059e049a4fceac2bae864e, type: 3}
     - {fileID: 1039321682, guid: 94ed89280f059e049a4fceac2bae864e, type: 3}
-  - CardsSprites:
+  - Suit: 1
+    CardsSprites:
     - {fileID: 2060190869, guid: 94ed89280f059e049a4fceac2bae864e, type: 3}
     - {fileID: -1054385919, guid: 94ed89280f059e049a4fceac2bae864e, type: 3}
     - {fileID: -1854246853, guid: 94ed89280f059e049a4fceac2bae864e, type: 3}

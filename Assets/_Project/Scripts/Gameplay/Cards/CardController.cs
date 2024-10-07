@@ -3,7 +3,6 @@ using System.Linq;
 using CardGame.Gameplay.Cards.Data;
 using CardGame.Gameplay.Cards.Deck;
 using UnityEngine;
-using Random = UnityEngine.Random;
 
 namespace CardGame.Gameplay.Cards
 {
@@ -25,24 +24,25 @@ namespace CardGame.Gameplay.Cards
             {
                 var cardsSprites = cardSuit.CardsSprites;
                 var backSprite = _backSprite;
+                var suit = cardSuit.Suit;
                 
                 for (var i = 0; i < cardsSprites.Length; i++)
                 {
                     var cardSprite = cardsSprites[i];
-                    InitializeCardsInfo((Denomination)(i + 1), cardSprite, backSprite);
+                    InitializeCardsInfo(suit, (Denomination)(i + 1), cardSprite, backSprite);
                 }
             }
             
             _cardsDeck = new CardsDeck(_cards);
             var sequences = _cardsDeck.CurrentSequences.ToArray();
 
-            InitializeBanks(sequences);
             InitializeCardGroups(sequences);
+            InitializeBanks(sequences);
         }
 
-        private void InitializeCardsInfo(Denomination denomination, Sprite cardSprite, Sprite backSprite)
+        private void InitializeCardsInfo(Suits suit, Denomination denomination, Sprite cardSprite, Sprite backSprite)
         {
-            var cardInfo = new CardInfo(denomination, cardSprite, backSprite);
+            var cardInfo = new CardInfo(suit, denomination, cardSprite, backSprite);
 
             if (!_cards.ContainsKey(denomination))
             {
@@ -50,15 +50,6 @@ namespace CardGame.Gameplay.Cards
             }
             
             _cards[denomination].Add(cardInfo);
-        }
-
-        private void InitializeBanks(IEnumerable<CardSequence> sequences)
-        {
-            var startingCards = sequences
-                .Select(s => s.FirstCard)
-                .ToArray();
-            
-            _bankController.Initialize(startingCards);
         }
 
         private void InitializeCardGroups(IEnumerable<CardSequence> sequences)
@@ -71,43 +62,43 @@ namespace CardGame.Gameplay.Cards
             }
         }
 
+        private void InitializeBanks(IEnumerable<CardSequence> sequences)
+        {
+            var startingCards = sequences
+                .Select(s => s.FirstCard)
+                .ToArray();
+            
+            _bankController.Initialize(startingCards);
+        }
+
         private Dictionary<CardGroup, List<CardInfo>> DistributeSequencesIntoGroups(IEnumerable<CardSequence> sequences)
         {
-            CardGroup lastCardGroup = null;
-            
             var cardSequences = sequences.ToArray();
             var cardsByCardGroup = new Dictionary<CardGroup, List<CardInfo>>();
+            
+            var groupQueue = new Queue<CardGroup>(_cardGroups);
             
             foreach (var sequence in cardSequences)
             {
                 foreach (var info in sequence.Sequence)
                 {
-                    var randomGroup = _cardGroups
-                        .Where(g => g != lastCardGroup && IsFullData(g) == false)
-                        .OrderBy(_ => Random.value)
-                        .FirstOrDefault();
-                    
-                    if (randomGroup == null && IsFullData(lastCardGroup))
+                    var nexGroup = groupQueue.Dequeue();
+
+                    if (nexGroup != null && IsFullData(nexGroup) == false)
+                    {
+                        groupQueue.Enqueue(nexGroup);
+                    }
+                    else
                     {
                         return cardsByCardGroup;
                     }
-
-                    if (randomGroup != null)
-                    {
-                        lastCardGroup = randomGroup;
-                    }
-
-                    if (lastCardGroup == null)
-                    {
-                        throw new System.Exception("No card group found");
-                    }
                     
-                    if (!cardsByCardGroup.ContainsKey(lastCardGroup))
+                    if (!cardsByCardGroup.ContainsKey(nexGroup))
                     {
-                        cardsByCardGroup.Add(lastCardGroup, new List<CardInfo>());
+                        cardsByCardGroup.Add(nexGroup, new List<CardInfo>());
                     }
             
-                    cardsByCardGroup[lastCardGroup].Add(info);
+                    cardsByCardGroup[nexGroup].Add(info);
                 }
             }
 

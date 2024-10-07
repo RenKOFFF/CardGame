@@ -6,7 +6,7 @@ namespace CardGame.Gameplay.Cards.Data
     [Serializable]
     public class CardSuit
     {
-        // public Sprite BackSprite;
+        public Suits Suit;
         public Sprite[] CardsSprites;
     }
 }
