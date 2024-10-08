@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace CardGame
 {
-    public class Boot : MonoBehaviour
+    public class EntryPoint : MonoBehaviour
     {
         [SerializeField] private CardController _cardController;
 

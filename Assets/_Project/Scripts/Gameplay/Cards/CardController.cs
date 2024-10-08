@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using CardGame.Gameplay.Cards.Data;
 using CardGame.Gameplay.Cards.Deck;
@@ -8,6 +9,8 @@ namespace CardGame.Gameplay.Cards
 {
     public class CardController : MonoBehaviour
     {
+        public Action<bool> OnGameOver;
+        
         [SerializeField] private Sprite _backSprite;
         [SerializeField] private CardSuit[] _cardsSuitsData;
         
