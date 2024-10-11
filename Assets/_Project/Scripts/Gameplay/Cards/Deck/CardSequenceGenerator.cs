@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using CardGame.Extensions;
 using CardGame.Gameplay.Cards.Data;
+using CardGame.Utils;
 using UnityEngine;
 
 namespace CardGame.Gameplay.Cards.Deck
@@ -9,45 +11,56 @@ namespace CardGame.Gameplay.Cards.Deck
     {
         public const int MIN_CARD_SEQUENCE_LENGTH = 2;
         public const int MAX_CARD_SEQUENCE_LENGTH = 7;
-        
-        public const float BOTTOM_CARD_PROBABILITY = 0.35f;
+
+        public const float FORWARD_DIRECTION_PROBABILITY = 0.65f;
         public const float CHANGE_DIRECTION_PROBABILITY = 0.15f;
 
-        public CardSequenceGenerator(IEnumerable<CardInfo> allCards)
+        public CardSequenceGenerator(Dictionary<Denomination, List<CardInfo>> cards, int cardsRequired)
         {
             Sequences = new List<CardSequence>();
-            SeparateCards(allCards);
+            SeparateCards(cards, cardsRequired);
         }
 
         public List<CardSequence> Sequences { get; }
 
-        private void SeparateCards(IEnumerable<CardInfo> allCards)
+        private void SeparateCards(Dictionary<Denomination, List<CardInfo>> cards, int cardsRequired)
         {
-            var cardInfos = allCards.ToList();
-
-            while (cardInfos.Count - MAX_CARD_SEQUENCE_LENGTH > 0)
+            var totalSequencesLength = 0;
+            
+            while (totalSequencesLength < cardsRequired)
             {
-                var sequenceLength = Random.Range(MIN_CARD_SEQUENCE_LENGTH, MAX_CARD_SEQUENCE_LENGTH + 1);
-                var sequence = cardInfos.GetRange(0, sequenceLength);
+                var isForwardDirection = Random.value <= FORWARD_DIRECTION_PROBABILITY;
+                var canChangeDirection = true;
                 
-                var isBottom = Random.value <= BOTTOM_CARD_PROBABILITY;
+                var sequenceLength = Random.Range(MIN_CARD_SEQUENCE_LENGTH, 
+                    Mathf.Min(MAX_CARD_SEQUENCE_LENGTH, cardsRequired - totalSequencesLength) + 1);
                 
-                if (isBottom)
+                var currentDenomination = Utility.GetRandomOf<Denomination>(min: 1);
+
+                var currentSequence = new List<CardInfo>();
+                
+                for (var i = 0; i < sequenceLength + 1; i++)
                 {
-                    sequence.Reverse();
+                    var currentCard = cards[currentDenomination].GetRandom();
+                    currentSequence.Add(currentCard);
+
+                    var neighbourCards = CardInfo.GetNeighbourCards(currentDenomination);
+                    currentDenomination = isForwardDirection ? neighbourCards.Top : neighbourCards.Bottom;
+
+                    if (canChangeDirection && Random.value <= CHANGE_DIRECTION_PROBABILITY)
+                    {
+                        isForwardDirection = !isForwardDirection;
+                        canChangeDirection = false;
+                    }
                 }
                 
-                var cardSequence = new CardSequence(sequence);
+                totalSequencesLength += sequenceLength;
                 
+                var cardSequence = new CardSequence(currentSequence);
                 Sequences.Add(cardSequence);
-                cardInfos.RemoveRange(0, sequenceLength);
             }
-            
-            var lastCardSequence = new CardSequence(cardInfos);
-                
-            Sequences.Add(lastCardSequence);
-            cardInfos.Clear();
         }
+
 
         public IEnumerable<CardSequence> GenerateSequences()
         {

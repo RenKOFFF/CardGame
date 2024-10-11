@@ -11,17 +11,18 @@ namespace CardGame.Gameplay.Cards.Deck
         
         private readonly CardSequenceGenerator _cardSequenceGenerator;
 
-        public CardsDeck(Dictionary<Denomination, List<CardInfo>> cards)
+        public CardsDeck(Dictionary<Denomination, List<CardInfo>> cards, int cardsRequired)
         {
-            _allCards = cards
-                .SelectMany(x => x.Value)
-                .OrderBy(c => c.Suit)
-                .ThenBy(c => c.Denomination)
-                .ToArray();
+            // _allCards = cards
+            //     .SelectMany(x => x.Value)
+            //     .OrderBy(c => c.Suit)
+            //     .ThenBy(c => c.Denomination)
+            //     .ToArray();
             
-            _cardSequenceGenerator = new CardSequenceGenerator(_allCards);
+            _cardSequenceGenerator = new CardSequenceGenerator(cards, cardsRequired);
             
             _cards = cards;
+            
             CurrentSequences = GenerateSequences();
         }
 

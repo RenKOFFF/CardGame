@@ -16,7 +16,7 @@ namespace CardGame.Gameplay.Cards.Data
             FrontSprite = frontSprite;
             BackSprite = backSprite;
         }
-        
+
         public static bool IsNeighbourCards(Denomination first, Denomination second)
         {
             Denomination topNeighbour;
@@ -31,6 +31,16 @@ namespace CardGame.Gameplay.Cards.Data
             else bottomNeighbour = first - 1;
 
             return second == topNeighbour || second == bottomNeighbour;
+        }
+
+        public static (Denomination Top, Denomination Bottom) GetNeighbourCards(Denomination denomination)
+        {
+            return denomination switch
+            {
+                Denomination.King => (Denomination.A, Denomination.Queen),
+                Denomination.A => (Denomination.Two, Denomination.King),
+                _ => (denomination + 1, denomination - 1)
+            };
         }
     }
 }

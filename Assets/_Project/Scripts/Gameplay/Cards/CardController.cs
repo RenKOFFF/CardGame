@@ -35,8 +35,10 @@ namespace CardGame.Gameplay.Cards
                     InitializeCardsInfo(suit, (Denomination)(i + 1), cardSprite, backSprite);
                 }
             }
+
+            var cardsRequired = _cardGroups.Sum(g => g.CardCount);
             
-            _cardsDeck = new CardsDeck(_cards);
+            _cardsDeck = new CardsDeck(_cards, cardsRequired);
             var sequences = _cardsDeck.CurrentSequences.ToArray();
 
             InitializeCardGroups(sequences);
