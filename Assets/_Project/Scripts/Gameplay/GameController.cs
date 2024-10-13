@@ -15,7 +15,7 @@ namespace CardGame.Gameplay
         
         private int _emptyGroups;
 
-        private void Start()
+        public void Initialize()
         {
             foreach (var cardGroup in _cardGroups)
             {

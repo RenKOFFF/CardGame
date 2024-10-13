@@ -1,6 +1,4 @@
-﻿using System.Drawing;
-using UnityEngine;
-using UnityEngine.Events;
+﻿using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 

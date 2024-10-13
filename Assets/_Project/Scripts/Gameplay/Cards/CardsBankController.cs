@@ -58,6 +58,11 @@ namespace CardGame.Gameplay.Cards
             ChangeCurrentCard(_cardsPool.Peek());
         }
 
+        private void OnDestroy()
+        {
+            DOTween.Kill(this);
+        }
+
         public void SetCard(Card card)
         {
             CurrentCard = card;
@@ -66,7 +71,9 @@ namespace CardGame.Gameplay.Cards
             CurrentCard.ShowFront();
 
             CurrentCard.transform.SetParent(_currentCardHolder, true);
-            CurrentCard.transform.DOLocalJump(Vector3.zero, 20f, 1, 0.5f);
+            CurrentCard.transform
+                .DOLocalJump(Vector3.zero, 20f, 1, 0.5f)
+                .SetTarget(this);
 
             OnSetCard?.Invoke(card);
         }
@@ -131,6 +138,7 @@ namespace CardGame.Gameplay.Cards
                 var position = CalculateCardPosition(_cardsPool.Count, index);
 
                 var sequence = DOTween.Sequence();
+                sequence.SetTarget(this);
 
                 sequence
                     .Append(card.transform

@@ -281,7 +281,7 @@ GameObject:
   - component: {fileID: 89536204}
   - component: {fileID: 89536205}
   m_Layer: 0
-  m_Name: Boot
+  m_Name: EntryPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -315,6 +315,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _cardController: {fileID: 68323181}
+  _gameController: {fileID: 1127006378}
 --- !u!1 &197634824
 GameObject:
   m_ObjectHideFlags: 0

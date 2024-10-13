@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using CardGame.Gameplay.Cards.Data;
 
 namespace CardGame.Gameplay.Cards.Deck
@@ -13,12 +12,6 @@ namespace CardGame.Gameplay.Cards.Deck
 
         public CardsDeck(Dictionary<Denomination, List<CardInfo>> cards, int cardsRequired)
         {
-            // _allCards = cards
-            //     .SelectMany(x => x.Value)
-            //     .OrderBy(c => c.Suit)
-            //     .ThenBy(c => c.Denomination)
-            //     .ToArray();
-            
             _cardSequenceGenerator = new CardSequenceGenerator(cards, cardsRequired);
             
             _cards = cards;

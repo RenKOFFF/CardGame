@@ -12,7 +12,7 @@ namespace CardGame.Gameplay.Cards
         [SerializeField] private Image _suitImage;
 
         private CardInfo _info;
-
+        
         private event Action<Card> OnClick;
 
         public Card Parent { get; private set; }
@@ -27,20 +27,25 @@ namespace CardGame.Gameplay.Cards
             name = $"Card - {_info.Denomination}";
         }
 
+        private void OnDestroy()
+        {
+            DOTween.Kill(this);
+        }
+
         public void ShowFront()
         {
-            var sequence = DOTween.Sequence();
+            var showFrontSequence = DOTween.Sequence();
+            showFrontSequence.SetTarget(this);
 
             const float fullRotationDuration = 0.5f;
             const float rotateOneSideDuration = fullRotationDuration / 2;
-
-            sequence
+            
+            showFrontSequence
                 .Append(_suitImage.transform
                     .DORotate(Vector3.up * 90f, rotateOneSideDuration)
                     .OnComplete(() =>
                     {
                         _suitImage.sprite = _info.FrontSprite;
-
                         _suitImage.transform.rotation = Quaternion.Euler(Vector3.up * 270f);
                     }))
                 .Append(_suitImage.transform
@@ -56,7 +61,8 @@ namespace CardGame.Gameplay.Cards
             transform
                 .DOScale(Vector3.one, 0.5f)
                 .SetEase(Ease.OutBack)
-                .SetDelay(delay * index);
+                .SetDelay(delay * index)
+                .SetTarget(this);
         }
 
         public void OnPointerClick(PointerEventData eventData)
