@@ -1,6 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
+using CardGame.Extensions;
 using CardGame.Gameplay.Cards.Data;
 using CardGame.Gameplay.Cards.Deck;
 using UnityEngine;
@@ -9,8 +9,6 @@ namespace CardGame.Gameplay.Cards
 {
     public class CardController : MonoBehaviour
     {
-        public Action<bool> OnGameOver;
-        
         [SerializeField] private Sprite _backSprite;
         [SerializeField] private CardSuit[] _cardsSuitsData;
         
@@ -39,7 +37,7 @@ namespace CardGame.Gameplay.Cards
             var cardsRequired = _cardGroups.Sum(g => g.CardCount);
             
             _cardsDeck = new CardsDeck(_cards, cardsRequired);
-            var sequences = _cardsDeck.CurrentSequences.ToArray();
+            var sequences = _cardsDeck.CurrentSequences.Reverse().ToArray();
 
             InitializeCardGroups(sequences);
             InitializeBanks(sequences);
@@ -81,23 +79,37 @@ namespace CardGame.Gameplay.Cards
             var cardSequences = sequences.ToArray();
             var cardsByCardGroup = new Dictionary<CardGroup, List<CardInfo>>();
             
-            var groupQueue = new Queue<CardGroup>(_cardGroups);
+            var groupList = new List<CardGroup>(_cardGroups);
             
             foreach (var sequence in cardSequences)
             {
-                foreach (var info in sequence.Sequence)
+                var reversedSequence = sequence.Sequence.Reverse();
+                foreach (var info in reversedSequence)
                 {
-                    var nexGroup = groupQueue.Dequeue();
-
-                    if (nexGroup != null && IsFullData(nexGroup) == false)
+                    CardGroup nexGroup;
+                    if (groupList.Count != 0)
                     {
-                        groupQueue.Enqueue(nexGroup);
+                        nexGroup = groupList.GetRandom();
+                        groupList.Remove(nexGroup);
                     }
                     else
                     {
+                        groupList.AddRange(_cardGroups.Where(g => IsFullData(g) == false));
+
+                        if (groupList.Count == 0)
+                        {
+                            return cardsByCardGroup;
+                        }
+                        
+                        nexGroup = groupList.GetRandom();
+                        groupList.Remove(nexGroup);
+                    }
+
+                    if (nexGroup == null && groupList.Count == 0)
+                    {
                         return cardsByCardGroup;
                     }
-                    
+
                     if (!cardsByCardGroup.ContainsKey(nexGroup))
                     {
                         cardsByCardGroup.Add(nexGroup, new List<CardInfo>());

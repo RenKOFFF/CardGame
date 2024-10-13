@@ -1,18 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using CardGame.Gameplay.Cards.Data;
-using CardGame.Gameplay.Cards.Deck;
-using DG.Tweening;
 using UnityEngine;
 
 namespace CardGame.Gameplay.Cards
 {
     public class CardGroup : MonoBehaviour
     {
+        public event Action<CardGroup> OnGroupEmpty;
+        
         [SerializeField] private Card[] _emptyCards;
 
         private readonly Stack<Card> _cards = new();
+        
         public int CardCount => _emptyCards.Length;
         public Card TopCard => _cards.Count == 0 ? null : _cards.Peek();
 
@@ -25,6 +25,11 @@ namespace CardGame.Gameplay.Cards
 
                 Register(emptyCard, cardInfo);
                 emptyCard.PlayShowAnimation(i);
+                
+                if (i == 0)
+                {
+                    emptyCard.SubscribeOnClick(OnLastPicked);
+                }
             }
 
             _cards.Peek().ShowFront();
@@ -60,6 +65,16 @@ namespace CardGame.Gameplay.Cards
 
                 CardsBankController.Instance.SetCard(card);
             }
+        }
+
+        private void OnLastPicked(Card card)
+        {
+            if (_cards.Count != 0 && _cards.Peek() != card)
+                return;
+            
+            card.UnsubscribeOnClick(TryPickCard);
+            
+            OnGroupEmpty?.Invoke(this);
         }
     }
 }

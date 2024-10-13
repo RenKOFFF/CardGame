@@ -1,4 +1,6 @@
-﻿using CardGame.Gameplay.Cards;
+﻿using System;
+using CardGame.Gameplay;
+using CardGame.Gameplay.Cards;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -7,21 +9,21 @@ namespace CardGame.UI
 {
     public class GameUI : MonoBehaviour
     {
-        [SerializeField] private CardController _cardController;
+        [SerializeField] private GameController _gameController;
         
         [SerializeField] private Button _reloadButton;
-        [SerializeField] private GameObject _winView;
-        [SerializeField] private GameObject _loseView;
+        [SerializeField] private GameEndPanel _winView;
+        [SerializeField] private GameEndPanel _loseView;
         
         private void Start()
         {
             _reloadButton.onClick.AddListener(ReloadLevel);
-            _cardController.OnGameOver += OnGameOver;
+            _gameController.OnGameOver += OnGameOver;
         }
 
         private void OnDestroy()
         {
-            _cardController.OnGameOver -= OnGameOver;
+            _gameController.OnGameOver -= OnGameOver;
         }
 
         private static void ReloadLevel()
@@ -31,16 +33,18 @@ namespace CardGame.UI
             SceneManager.LoadScene(currentScene.buildIndex);
         }
 
-        private void OnGameOver(bool isWin)
+        private void OnGameOver(GameResult gameResult)
         {
-            switch (isWin)
+            switch (gameResult)
             {
-                case true:
-                    _winView.SetActive(true);
+                case GameResult.Win:
+                    _winView.Show();
+                    _winView.SubscribeOnClick(ReloadLevel);
                     break;
                 
-                case false:
-                    _loseView.SetActive(true);
+                case GameResult.Lose:
+                    _loseView.Show();
+                    _loseView.SubscribeOnClick(ReloadLevel);
                     break;
             }
         }

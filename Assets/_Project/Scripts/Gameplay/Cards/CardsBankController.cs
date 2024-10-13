@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using CardGame.Gameplay.Cards.Data;
 using DG.Tweening;
@@ -8,16 +9,19 @@ namespace CardGame.Gameplay.Cards
 {
     public class CardsBankController : MonoBehaviour
     {
+        public event Action OnBankEmpty;
+        public event Action<Card> OnSetCard;
+        
         private const float _POOL_SPACING_MIN = 5f;
         private const float _POOL_SPACING_MAX = 20f;
 
         [SerializeField] private CardGroup[] _cardGroups;
-        
+
         [SerializeField] private Transform _currentCardHolder;
 
         [SerializeField] private Transform _poolCardHolder;
         [SerializeField] private Card _cardPrefab;
-        
+
         private readonly List<Card> _passedCards = new();
         private readonly Stack<Card> _cardsPool = new();
 
@@ -44,8 +48,13 @@ namespace CardGame.Gameplay.Cards
                 card.PlayShowAnimation(i);
 
                 card.SubscribeOnClick(ChangeCurrentCard);
-            }
 
+                if (i == 0)
+                {
+                    card.SubscribeOnClick(OnLastBankCardPicked);
+                }
+            }
+            
             ChangeCurrentCard(_cardsPool.Peek());
         }
 
@@ -58,6 +67,8 @@ namespace CardGame.Gameplay.Cards
 
             CurrentCard.transform.SetParent(_currentCardHolder, true);
             CurrentCard.transform.DOLocalJump(Vector3.zero, 20f, 1, 0.5f);
+
+            OnSetCard?.Invoke(card);
         }
 
         private void ChangeCurrentCard(Card card)
@@ -70,6 +81,16 @@ namespace CardGame.Gameplay.Cards
 
             SetCard(_cardsPool.Pop());
             RecalculateCardsPosition();
+        }
+
+        private void OnLastBankCardPicked(Card card)
+        {
+            if (_cardsPool.Count != 0 && _cardsPool.Peek() != card)
+                return;
+            
+            card.UnsubscribeOnClick(OnLastBankCardPicked);
+            
+            OnBankEmpty?.Invoke();
         }
 
         private CardInfo FindStartSequenceCard()

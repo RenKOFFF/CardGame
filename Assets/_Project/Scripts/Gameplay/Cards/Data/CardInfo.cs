@@ -23,10 +23,10 @@ namespace CardGame.Gameplay.Cards.Data
             Denomination bottomNeighbour;
 
             if (first == Denomination.King)
-                topNeighbour = Denomination.A;
+                topNeighbour = Denomination.Ace;
             else topNeighbour = first + 1;
 
-            if (first == Denomination.A)
+            if (first == Denomination.Ace)
                 bottomNeighbour = Denomination.King;
             else bottomNeighbour = first - 1;
 
@@ -37,8 +37,8 @@ namespace CardGame.Gameplay.Cards.Data
         {
             return denomination switch
             {
-                Denomination.King => (Denomination.A, Denomination.Queen),
-                Denomination.A => (Denomination.Two, Denomination.King),
+                Denomination.King => (Denomination.Ace, Denomination.Queen),
+                Denomination.Ace => (Denomination.Two, Denomination.King),
                 _ => (denomination + 1, denomination - 1)
             };
         }

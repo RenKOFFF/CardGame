@@ -3,7 +3,7 @@
     public enum Denomination
     {
         None,
-        A,
+        Ace,
         Two,
         Three,
         Four,

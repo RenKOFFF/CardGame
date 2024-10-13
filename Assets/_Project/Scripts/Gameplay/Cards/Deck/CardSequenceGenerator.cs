@@ -9,33 +9,71 @@ namespace CardGame.Gameplay.Cards.Deck
 {
     public class CardSequenceGenerator
     {
-        public const int MIN_CARD_SEQUENCE_LENGTH = 2;
-        public const int MAX_CARD_SEQUENCE_LENGTH = 7;
+        private const int _MIN_CARD_SEQUENCE_LENGTH = 2;
+        private const int _MAX_CARD_SEQUENCE_LENGTH = 7;
 
-        public const float FORWARD_DIRECTION_PROBABILITY = 0.65f;
-        public const float CHANGE_DIRECTION_PROBABILITY = 0.15f;
+        private const float _FORWARD_DIRECTION_PROBABILITY = 0.65f;
+        private const float _CHANGE_DIRECTION_PROBABILITY = 0.15f;
+        
+        private readonly Dictionary<Denomination, List<CardInfo>> _cards;
+        private readonly int _cardsRequired;
 
         public CardSequenceGenerator(Dictionary<Denomination, List<CardInfo>> cards, int cardsRequired)
         {
+            _cards = cards;
+            _cardsRequired = cardsRequired;
+            
             Sequences = new List<CardSequence>();
-            SeparateCards(cards, cardsRequired);
         }
 
-        public List<CardSequence> Sequences { get; }
+        private List<CardSequence> Sequences { get; }
+
+        public IEnumerable<CardSequence> GenerateSequences()
+        {
+            SeparateCards(_cards, _cardsRequired);
+            // SeparateCards2(_cards, _cardsRequired);
+            return Sequences;
+        }
 
         private void SeparateCards(Dictionary<Denomination, List<CardInfo>> cards, int cardsRequired)
         {
+            Sequences.Clear();
+            
             var totalSequencesLength = 0;
+            var selectedCards = new List<CardInfo>();
             
             while (totalSequencesLength < cardsRequired)
             {
-                var isForwardDirection = Random.value <= FORWARD_DIRECTION_PROBABILITY;
+                var isForwardDirection = Random.value <= _FORWARD_DIRECTION_PROBABILITY;
                 var canChangeDirection = true;
                 
-                var sequenceLength = Random.Range(MIN_CARD_SEQUENCE_LENGTH, 
-                    Mathf.Min(MAX_CARD_SEQUENCE_LENGTH, cardsRequired - totalSequencesLength) + 1);
+                var sequenceLength = Random.Range(_MIN_CARD_SEQUENCE_LENGTH, Mathf.Min(_MAX_CARD_SEQUENCE_LENGTH, cardsRequired - totalSequencesLength) + 1);
+
+                Denomination currentDenomination;
                 
-                var currentDenomination = Utility.GetRandomOf<Denomination>(min: 1);
+                if (Sequences.Count == 0)
+                {
+                    currentDenomination = Utility.GetRandomOf<Denomination>(min: 1);
+                }
+                else
+                {
+                    var distinctCards = cards
+                        .Select(c => c.Key)
+                        .Where(d => selectedCards
+                            .Select(s => s.Denomination)
+                            .Contains(d) == false)
+                        .ToList();
+
+                    if (distinctCards.Count == 0)
+                    {
+                        selectedCards.Clear();
+                        currentDenomination = Utility.GetRandomOf<Denomination>(min: 1);
+                    }
+                    else
+                    {
+                        currentDenomination = distinctCards.GetRandom();
+                    }
+                }
 
                 var currentSequence = new List<CardInfo>();
                 
@@ -47,7 +85,7 @@ namespace CardGame.Gameplay.Cards.Deck
                     var neighbourCards = CardInfo.GetNeighbourCards(currentDenomination);
                     currentDenomination = isForwardDirection ? neighbourCards.Top : neighbourCards.Bottom;
 
-                    if (canChangeDirection && Random.value <= CHANGE_DIRECTION_PROBABILITY)
+                    if (canChangeDirection && Random.value <= _CHANGE_DIRECTION_PROBABILITY)
                     {
                         isForwardDirection = !isForwardDirection;
                         canChangeDirection = false;
@@ -57,14 +95,39 @@ namespace CardGame.Gameplay.Cards.Deck
                 totalSequencesLength += sequenceLength;
                 
                 var cardSequence = new CardSequence(currentSequence);
+                selectedCards.AddRange(cardSequence.FullSequence);
+                
                 Sequences.Add(cardSequence);
             }
         }
 
-
-        public IEnumerable<CardSequence> GenerateSequences()
+        private void SeparateCardsSimple(Dictionary<Denomination, List<CardInfo>> cards, int cardsRequired)
         {
-            return Sequences;
+            Sequences.Clear();
+            
+            var totalSequencesLength = 0;
+            var currentDenomination = Denomination.Ace;
+            
+            while (totalSequencesLength < cardsRequired)
+            {
+                var sequenceLength = 8;
+                
+                var currentSequence = new List<CardInfo>();
+                
+                for (var i = 0; i < sequenceLength + 1; i++)
+                {
+                    var currentCard = cards[currentDenomination].GetRandom();
+                    currentSequence.Add(currentCard);
+
+                    var neighbourCards = CardInfo.GetNeighbourCards(currentDenomination);
+                    currentDenomination = neighbourCards.Top;
+                }
+                
+                totalSequencesLength += sequenceLength;
+                
+                var cardSequence = new CardSequence(currentSequence);
+                Sequences.Add(cardSequence);
+            }
         }
     }
 }
